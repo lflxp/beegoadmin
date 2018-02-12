@@ -1,7 +1,11 @@
 package controllers
 
 import (
+	"fmt"
+
 	"github.com/astaxie/beego"
+	"github.com/lflxp/beegoadmin/models"
+	"github.com/lflxp/beegoadmin/utils"
 )
 
 type MainController struct {
@@ -24,6 +28,8 @@ func (this *MainController) Admin() {
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.html"
 		} else if types == "test1" {
+			fmt.Println(utils.Register(&models.Cdn{}, &models.Machine{}, &models.Vpn{}))
+			// this.Data["Data"] =
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.1.html"
 		}
