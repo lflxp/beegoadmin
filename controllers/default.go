@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/astaxie/beego"
-	"github.com/lflxp/beegoadmin/models"
+	_ "github.com/lflxp/beegoadmin/models"
 	"github.com/lflxp/beegoadmin/utils"
 )
 
@@ -28,8 +28,8 @@ func (this *MainController) Admin() {
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.html"
 		} else if types == "test1" {
-			fmt.Println(utils.Register(&models.Cdn{}, &models.Machine{}, &models.Vpn{}))
-			// this.Data["Data"] =
+			fmt.Println(utils.Registered)
+			this.Data["Data"] = utils.Registered
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.1.html"
 		}

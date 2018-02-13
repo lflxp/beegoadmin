@@ -1,5 +1,14 @@
 package models
 
+import (
+	"github.com/lflxp/beegoadmin/utils"
+)
+
+func init() {
+	vpn := Vpn{}
+	utils.Register(vpn)
+}
+
 type Vpn struct {
 	Id   int64  `name:"id" search:"true"`
 	Vpn  string `name:"vpn" search:"true"`

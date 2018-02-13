@@ -1,5 +1,17 @@
 package models
 
+import (
+	"github.com/lflxp/beegoadmin/utils"
+)
+
+//auto register
+func init() {
+	cdn := Cdn{}
+	machine := Machine{}
+	utils.Register(cdn)
+	utils.Register(machine)
+}
+
 type Cdn struct {
 	Id       int64  `name:"id" search:"true"`
 	Cdn_name string `name:"cdn_name" search:"true"`
