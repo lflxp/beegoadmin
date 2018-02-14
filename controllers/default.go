@@ -30,6 +30,13 @@ func (this *MainController) Admin() {
 			this.Data["Data"] = utils.Registered
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.1.html"
+		} else if types == "table" {
+			data, err := utils.DirectJson("First", "Second", "Three", "Four", "Op", "Datetime")
+			if err == nil {
+				this.Data["Col"] = data
+			}
+			this.Data["User"] = "Boss"
+			this.TplName = "admin/table.html"
 		}
 	} else if this.Ctx.Request.Method == "POST" {
 		if types == "check" {
