@@ -6,10 +6,7 @@ import (
 
 //auto register
 func init() {
-	cdn := Cdn{}
-	machine := Machine{}
-	utils.Register(cdn)
-	utils.Register(machine)
+	utils.Register(new(Cdn), new(Machine))
 }
 
 type Cdn struct {

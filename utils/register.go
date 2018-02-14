@@ -14,7 +14,8 @@ func init() {
 
 func RigsterStruct(data interface{}) map[string]string {
 	tmp := map[string]string{}
-	v := reflect.ValueOf(data)
+	vv := reflect.ValueOf(data)
+	v := reflect.Indirect(vv)
 
 	tmp["Struct"] = v.Type().String()
 	for i := 0; i < v.NumField(); i++ {
@@ -38,8 +39,10 @@ func RigsterStruct(data interface{}) map[string]string {
 	return tmp
 }
 
-func Register(data interface{}) error {
-	Registered = append(Registered, RigsterStruct(data))
+func Register(data ...interface{}) error {
+	for _, model := range data {
+		Registered = append(Registered, RigsterStruct(model))
+	}
 	return nil
 }
 
