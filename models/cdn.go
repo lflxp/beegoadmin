@@ -1,12 +1,14 @@
 package models
 
 import (
-	"github.com/lflxp/beegoadmin/utils"
+	"time"
+	// "github.com/astaxie/beego/orm"
 )
 
 //auto register
 func init() {
-	utils.Register(new(Cdn), new(Machine))
+	Register(new(Cdn), new(Machine))
+	// orm.RegisterModel(new(Cdn), new(Machine))
 }
 
 type Cdn struct {
@@ -16,9 +18,11 @@ type Cdn struct {
 }
 
 type Machine struct {
-	Id   int64  `name:"id" search:"true"`
-	Sn   string `name:"sn" search:"true"`
-	Mac  string `name:"mac" search:"true"`
-	Ip   string `name:"ip" search:"true"`
-	Name string `name:"name" search:"true"`
+	Id     int64     `xorm:"autoincr" name:"id" search:"true"`
+	Sn     string    `xorm:"sn" name:"sn" search:"true"`
+	Mac    string    `xorm:"mac" name:"mac" search:"true"`
+	Ip     string    `xorm:"ip" name:"ip" search:"true"`
+	Name   string    `xorm:"name" name:"name" search:"true"`
+	Create time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Update time.Time `xorm:"updated"` //这个Field将在Insert或Update时自动赋值为当前时间
 }

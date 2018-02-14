@@ -1,14 +1,9 @@
 package models
 
-import (
-	"github.com/astaxie/beego/orm"
-	"github.com/lflxp/beegoadmin/utils"
-)
-
 func init() {
 	// vpn := Vpn{}s
-	utils.Register(new(Vpn))
-	orm.RegisterModel(new(Vpn))
+	Register(new(Vpn))
+	// orm.RegisterModel(new(Vpn))
 }
 
 type Vpn struct {

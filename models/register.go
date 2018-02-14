@@ -1,4 +1,4 @@
-package utils
+package models
 
 import (
 	"fmt"
@@ -12,12 +12,21 @@ func init() {
 	Registered = []map[string]string{}
 }
 
+func GetRegisterByName(name string) map[string]string {
+	for _, maps := range Registered {
+		if strings.ToUpper(maps["Struct"]) == strings.ToUpper(name) {
+			return maps
+		}
+	}
+	return nil
+}
+
 func RigsterStruct(data interface{}) map[string]string {
 	tmp := map[string]string{}
 	vv := reflect.ValueOf(data)
 	v := reflect.Indirect(vv)
 
-	tmp["Struct"] = v.Type().String()
+	tmp["Struct"] = strings.Split(v.Type().String(), ".")[1]
 	for i := 0; i < v.NumField(); i++ {
 		//利用反射获取structTag
 		tmp["Tag"] = fmt.Sprintf("%s", v.Type().Field(i).Tag)
