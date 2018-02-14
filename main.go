@@ -2,7 +2,9 @@ package main
 
 import (
 	"github.com/astaxie/beego"
+	_ "github.com/lflxp/beegoadmin/models"
 	_ "github.com/lflxp/beegoadmin/routers"
+	_ "github.com/lflxp/beegoadmin/utils"
 	_ "github.com/mattn/go-sqlite3"
 )
 

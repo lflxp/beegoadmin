@@ -5,8 +5,8 @@ import (
 	"time"
 
 	"github.com/astaxie/beego"
-	"github.com/astaxie/beego/orm"
 	"github.com/lflxp/beegoadmin/models"
+	"github.com/lflxp/beegoadmin/utils"
 )
 
 type MainController struct {
@@ -38,16 +38,16 @@ func (this *MainController) Admin() {
 			// if err == nil {
 			// 	this.Data["Col"] = data
 			// }
-			o := orm.NewOrm()
-			o.Using("default")
 
-			machine := new(models.Machine)
-			machine.Name = time.Now().Format("2006-01-02 15:04:05")
-			o.Insert(machine)
-
-			// var qs orm.QuerySeter
-			// qs := o.QueryTable("machine")
-			// qs.
+			tt := models.Machine{}
+			tt.Mac = "DDD"
+			tt.Ip = "1.2.3.4"
+			tt.Name = time.Now().Format("2006-01-02 15:03:05")
+			num, err := utils.Engine.Insert(&tt)
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			beego.Critical(num)
 			Name := this.GetString("name", "None")
 			if Name != "None" {
 				this.Data["Col"] = models.GetRegisterByName(Name)
