@@ -86,7 +86,7 @@
                                 data-page-list="[10, 25, 50, 100, ALL]"
                                 data-show-footer="false"
                                 data-side-pagination="server"
-                                data-url="/admin/data"
+                                data-url="/admin/data?name={{.Name}}"
                                 data-response-handler="responseHandler">
                                 <!-- <thead>
                                     <tr>
@@ -108,7 +108,8 @@
             selections = [];
             
         $table.bootstrapTable({
-            height:getHeight(),
+            // height:getHeight(),
+            height:400,
             columns:eval({{.Col | admincolumns}})
         });
 
@@ -246,7 +247,8 @@
             return '$' + total;
         }
         function getHeight() {
-            return $(window).height() - $('h1').outerHeight(true);
+            // return $(window).height() - $('h1').outerHeight(true);
+            return $(window).height();
         }
         $(function () {
             var scripts = [

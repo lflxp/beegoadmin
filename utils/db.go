@@ -34,7 +34,7 @@ func init() {
 		panic(err)
 	}
 	Engine.ShowSQL(true)
-	Engine.Logger().SetLevel(core.LOG_OFF)
+	Engine.Logger().SetLevel(core.LOG_DEBUG)
 	Engine.SetMaxIdleConns(300)
 	Engine.SetMaxOpenConns(300)
 	Engine.SetMapper(core.SnakeMapper{})

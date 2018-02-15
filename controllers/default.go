@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/astaxie/beego"
@@ -47,24 +48,62 @@ func (this *MainController) Admin() {
 			if err != nil {
 				beego.Critical(err.Error())
 			}
+
+			tt1 := models.Vpn{}
+			tt1.Name = "ok"
+			utils.Engine.Insert(&tt1)
 			beego.Critical(num)
 			Name := this.GetString("name", "None")
 			if Name != "None" {
 				this.Data["Col"] = models.GetRegisterByName(Name)
 			}
+			this.Data["Name"] = Name
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/table.html"
 		} else if types == "data" {
-			ttt := map[string]interface{}{}
-			tmp := []map[string]string{}
-			for i := 0; i < 1000; i++ {
-				t := map[string]string{}
-				t["id"] = fmt.Sprintf("%d", i)
-				t["type"] = "type"
-				tmp = append(tmp, t)
+			name := this.GetString("name", "None")
+			order := this.GetString("order", "None")
+			offset, err := this.GetInt("offset")
+			if err != nil {
+				beego.Critical(err.Error())
 			}
-			ttt["total"] = 1000
-			ttt["rows"] = tmp
+			limit, err := this.GetInt("limit")
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			beego.Critical(name, order, offset, limit)
+			// ttt := map[string]interface{}{}
+			// tmp := []map[string]string{}
+			// for i := 0; i < 1000; i++ {
+			// 	t := map[string]string{}
+			// 	t["id"] = fmt.Sprintf("%d", i)
+			// 	t["type"] = "type"
+			// 	tmp = append(tmp, t)
+			// }
+			// ttt["total"] = 1000
+			// ttt["rows"] = tmp
+			sql := fmt.Sprintf("select * from admin_%s  order by id %s limit %d offset %d", strings.ToLower(name), order, limit, offset)
+			result, err := utils.Engine.Query(sql)
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			total, err := utils.Engine.Table("admin_" + strings.ToLower(name)).Count()
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			beego.Critical(sql)
+			ttt := map[string]interface{}{}
+			t2 := []map[string]string{}
+			for _, x := range result {
+				tmp := map[string]string{}
+				for key, value := range x {
+					// result[n][key] = string(value)
+					tmp[strings.ToLower(key)] = string(value)
+				}
+				t2 = append(t2, tmp)
+			}
+			ttt["rows"] = t2
+			ttt["total"] = total
 			this.Data["json"] = ttt
 			this.ServeJSON()
 		}
