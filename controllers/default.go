@@ -111,6 +111,17 @@ func (this *MainController) Admin() {
 		if types == "check" {
 			this.Data["json"] = "xxo"
 			this.ServeJSON()
+		} else if types == "delete" {
+			ids := this.GetString("ids", "None")
+			name := this.GetString("name", "None")
+			beego.Critical(ids, name)
+			sql := fmt.Sprintf("delete from admin_%s where id in (%s)", name, ids)
+			_, err := utils.Engine.Query(sql)
+			if err != nil {
+				this.Ctx.WriteString(err.Error())
+				return
+			}
+			this.Ctx.WriteString(fmt.Sprintf("delete %s %s success", name, ids))
 		}
 	}
 }

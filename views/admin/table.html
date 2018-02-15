@@ -47,14 +47,14 @@
     <ol class="breadcrumb">
         <li><a href="/admin/test1">Home</a></li>
         <li><a href="/admin/test">Library</a></li>
-        <li class="active">Data</li>
+        <li class="active">{{.Name}}</li>
     </ol>
 
     <div class="row">
         <div class="col-md-12">  
             <div class="row">
                 <div class="col-xs-12 col-sm-10 col-md-offset-1">
-                    <h3>Select User to Change</h3>
+                    <h3>Select {{.Name}} to Change</h3>
                     <!-- <ul class="pager">
                         <li class="previous disabled">Site Administrator</li>
                         <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
@@ -64,7 +64,7 @@
                         <button id="remove" class="btn btn-danger" disabled>
                             <i class="glyphicon glyphicon-remove"></i> Delete
                         </button>
-                        <button id="add" class="btn btn-success" disabled>
+                        <button id="add" class="btn btn-success">
                             <i class="glyphicon glyphicon-plus"></i> ADD 
                         </button>
                     </div>
@@ -124,41 +124,6 @@
         //     console.log('ok');
         // }
 
-        $(function () {
-            var data = [
-                {
-                    "id": 0,
-                    "name": "Item 0",
-                    "price": "$0"
-                },
-                {
-                    "id": 1,
-                    "name": "Item 1",
-                    "price": "$1"
-                },
-                {
-                    "id": 2,
-                    "name": "Item 2",
-                    "price": "$2"
-                },
-                {
-                    "id": 3,
-                    "name": "Item 3",
-                    "price": "$3"
-                },
-                {
-                    "id": 4,
-                    "name": "Item 4",
-                    "price": "$4"
-                },
-                {
-                    "id": 5,
-                    "name": "Item 5",
-                    "price": "$5"
-                }
-            ];
-            $table.bootstrapTable({data: data});
-        });
         setTimeout(function () {
             $table.bootstrapTable('resetView');
         }, 200);
@@ -181,12 +146,22 @@
             console.log(name, args);
         });
         $remove.click(function () {
-            var ids = getIdSelections();
-            $table.bootstrapTable('remove', {
-                field: 'id',
-                values: ids
-            });
-            $remove.prop('disabled', true);
+            var r = confirm("确定删除吗？");
+            if (r==true){
+                var ids = getIdSelections();
+                $.ajax({
+                    url:'/admin/delete?name={{.Name}}&ids='+ids.join(),
+                    type:'Post',
+                    success:function (data) {
+                        alert(data);
+                        $table.bootstrapTable('remove', {
+                            field: 'id',
+                            values: ids
+                        });
+                    }
+                })
+                $remove.prop('disabled', true);
+            }
         });
         $(window).resize(function () {
             $table.bootstrapTable('resetView', {
