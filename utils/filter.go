@@ -11,6 +11,7 @@ import (
 func init() {
 	beego.AddFuncMap("beegoli", BeegoLi)
 	beego.AddFuncMap("admincolumns", AdminColumns)
+	beego.AddFuncMap("formcolumns", FormColumns)
 }
 
 func BeegoLi(info []map[string]string) string {
@@ -32,6 +33,23 @@ func AdminColumns(data map[string]string) string {
 	result, err := DirectJson(strings.Split(col, " ")...)
 	if err != nil {
 		return err.Error()
+	}
+	return result
+}
+
+func FormColumns(data []map[string]string) string {
+	result := ""
+	text := `<div class="form-group">
+	<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> $LABELS </label>
+	<div class="col-sm-10">
+		<input name="$NAME" placeholder="$LABELS" class="col-xs-10 col-sm-10" type="text">
+	</div>
+</div>`
+	for _, info := range data {
+		switch info["Type"] {
+		case "string":
+			result += strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1)
+		}
 	}
 	return result
 }

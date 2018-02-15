@@ -31,6 +31,10 @@ func (this *MainController) Admin() {
 			this.TplName = "admin/test.html"
 		} else if types == "add" {
 			name := this.GetString("name", "None")
+			this.Data["Data"] = models.Registered
+			// if name != "None" {
+			// 	this.Data["Col"] = models.GetRegisterByName(name)
+			// }
 			this.Data["Name"] = name
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/add.html"

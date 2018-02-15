@@ -65,6 +65,7 @@
             <div class="row">
                 <div class="col-sm-12">
                     <form class="form-horizontal" role="form">  
+                        {{.Data| formcolumns | str2html}}
                         <div class="form-group">
                             <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> Text Field </label>
                             <div class="col-sm-10">
