@@ -29,6 +29,11 @@ func (this *MainController) Admin() {
 		} else if types == "test" {
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.html"
+		} else if types == "add" {
+			name := this.GetString("name", "None")
+			this.Data["Name"] = name
+			this.Data["User"] = "Boss"
+			this.TplName = "admin/add.html"
 		} else if types == "test1" {
 			fmt.Println(models.Registered)
 			this.Data["Data"] = models.Registered
