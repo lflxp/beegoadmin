@@ -42,13 +42,23 @@ func FormColumns(data []map[string]string) string {
 	text := `<div class="form-group">
 	<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> $LABELS </label>
 	<div class="col-sm-10">
-		<input name="$NAME" placeholder="$LABELS" class="col-xs-10 col-sm-10" type="text">
+		<input name="$NAME" placeholder="$LABELS" class="col-xs-10 col-sm-10" type="$TYPE">
+	</div>
+</div>`
+	textarea := `<div class="form-group">
+	<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> Text Field </label>
+	<div class="col-sm-10">
+		<textarea name="textarea" class="col-xs-10 col-sm-10" rows="10"></textarea>
 	</div>
 </div>`
 	for _, info := range data {
 		switch info["Type"] {
 		case "string":
-			result += strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1)
+			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","text")
+		case "int","int16","int64":
+			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","number")
+		case "textarea":
+			result += strings.Replace(strings.Replace(strings.Replace(textarea, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","number")
 		}
 	}
 	return result
