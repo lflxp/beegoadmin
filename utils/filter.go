@@ -54,11 +54,11 @@ func FormColumns(data []map[string]string) string {
 	for _, info := range data {
 		switch info["Type"] {
 		case "string":
-			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","text")
-		case "int","int16","int64":
-			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","number")
+			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1), "$TYPE", "text", -1)
+		case "int", "int16", "int64":
+			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1), "$TYPE", "number", -1)
 		case "textarea":
-			result += strings.Replace(strings.Replace(strings.Replace(textarea, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1),"$TYPE","number")
+			result += strings.Replace(strings.Replace(strings.Replace(textarea, "$NAME", info["Struct"], -1), "$LABELS", info["Struct"], -1), "$TYPE", "number", -1)
 		}
 	}
 	return result
