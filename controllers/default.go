@@ -58,16 +58,21 @@ func (this *MainController) Admin() {
 			if err != nil {
 				beego.Critical(err.Error())
 			}
+			beego.Critical(num)
 
 			tt1 := models.Vpn{}
-			tt1.Id = 9
+			tt1.Ip = "9.9.9.9"
+			tt1.Vpn = "bj-001"
 			tt1.Name = "ok"
 			utils.Engine.Insert(&tt1)
 
 			m1 := models.More{}
-			m1.Vpn = tt1
-			utils.Engine.Insert(&m1)
-			beego.Critical(num)
+			// m1.Vpn = tt1
+			n, e := utils.Engine.Insert(&m1)
+			if e != nil {
+				beego.Critical(e.Error())
+			}
+			beego.Critical(n)
 			Name := this.GetString("name", "None")
 			if Name != "None" {
 				this.Data["Col"] = models.GetRegisterByName(Name)
@@ -137,6 +142,35 @@ func (this *MainController) Admin() {
 				return
 			}
 			this.Ctx.WriteString(fmt.Sprintf("delete %s %s success", name, ids))
+		} else if types == "add" {
+			col := []string{}
+			value := []string{}
+			result := map[string]string{}
+
+			name := this.GetString("table", "None")
+			beego.Critical(string(this.Ctx.Input.RequestBody))
+			//获取字段和所有值
+			body := strings.Replace(string(this.Ctx.Input.RequestBody), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
+			for _, x := range strings.Split(body, "&") {
+				tmp := strings.Split(x, "=")
+				result[tmp[0]] += fmt.Sprintf("%s ", tmp[1])
+				// col = append(col, tmp[0])
+				// value = append(value, fmt.Sprintf("'%s'", tmp[1]))
+			}
+
+			for keyed, valueed := range result {
+				col = append(col, keyed)
+				value = append(value, fmt.Sprintf("'%s'", strings.Replace(strings.TrimSpace(valueed), " ", ",", -1)))
+			}
+			sql := fmt.Sprintf("insert into %s%s(%s) values (%s)", beego.AppConfig.String("snakeMapper"), name, strings.Join(col, ","), strings.Join(value, ","))
+			beego.Critical(sql)
+			_, err := utils.Engine.Query(sql)
+			if err != nil {
+				this.Ctx.WriteString(err.Error())
+				return
+			}
+			// this.Ctx.WriteString("insert ok")
+			this.Ctx.Redirect(301, fmt.Sprintf("/admin/add?name=%s", name))
 		}
 	}
 }

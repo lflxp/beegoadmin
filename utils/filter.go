@@ -16,10 +16,11 @@ func init() {
 }
 
 func BeegoLi(info []map[string]string) string {
-	result := fmt.Sprintf("<li class=\"list-group-item list-group-item-info\">%s</li>", strings.ToUpper(beego.AppConfig.String("appname")))
+	// result := fmt.Sprintf("<li class=\"list-group-item list-group-item-info\">%s</li>", strings.ToUpper(beego.AppConfig.String("appname")))
+	result := fmt.Sprintf("<li class=\"list-group-item list-group-item-info\">%s</li>", strings.ToUpper(info[0]["Services"]))
 	for _, data := range info {
 		// result += fmt.Sprintf("<li class=\"list-group-item list-group-item-info\">%s</li>", data["Struct"])
-		result += fmt.Sprintf("<li class=\"list-group-item\"><a class=\"badge\" href=\"#\">Change</a><a class=\"badge\" href=\"/admin/add?name=%s\">Add</a><a href=\"/admin/table?name=%s\" target=\"_self\">%s</a></li>", data["Struct"], data["Struct"], data["Struct"])
+		result += fmt.Sprintf("<li class=\"list-group-item\"><a class=\"badge\" href=\"/admin/table?name=%s\">Change</a><a class=\"badge\" href=\"/admin/add?name=%s\">Add</a><a href=\"/admin/table?name=%s\" target=\"_self\">%s</a></li>", data["Struct"], data["Struct"], data["Struct"], data["Struct"])
 		// for _, x := range strings.Split(data["Name"], " ") {
 		// 	result += fmt.Sprintf("<li class=\"list-group-item\"><a class=\"badge\" href=\"#\">Change</a><a class=\"badge\" href=\"#\">Add</a>%s</li>", x)
 		// }
@@ -30,7 +31,7 @@ func BeegoLi(info []map[string]string) string {
 
 func AdminColumns(data map[string]string) string {
 	//get columns
-	col := strings.TrimSpace(data["Name"])
+	col := strings.TrimSpace(data["Names"])
 	result, err := DirectJson(strings.Split(col, " ")...)
 	if err != nil {
 		return err.Error()
@@ -45,8 +46,8 @@ func FormColumns(data map[string]string) string {
 	result := ""
 	text := `<div class="form-group">
 	<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> $LABELS </label>
-	<div class="col-sm-8">
-		<input name="$NAME" placeholder="$LABELS" class="col-xs-6 col-sm-6" type="$TYPE">
+	<div class="col-sm-10">
+		<input name="$NAME" placeholder="$LABELS" class="col-xs-12 col-sm-12" type="$TYPE">
 	</div>
 </div>`
 	textarea := `<div class="form-group">
@@ -62,7 +63,7 @@ func FormColumns(data map[string]string) string {
 	</div>
 </div>`
 	selected := `<div class="form-group">
-	<label class="col-sm-2 control-label no-padding-right" for="form-field-1"> $LABELS </label>
+	<label class="col-sm-2 control-label no-padding-right" for="$NAME"> $LABELS </label>
 	<div class="col-sm-10">
 		<select name="$NAME">
 			$CONTENT
@@ -93,9 +94,33 @@ jQuery(function($){
 		});
 });
 </script>`
+	timed := `<div class="form-group">
+	<label class="col-sm-2 control-label no-padding-top" for="date-timepicker1"> $LABELS </label>
+
+	<div class="col-sm-10">
+		<input id="date-timepicker1" name="$NAME" type="text" class="col-xs-2 col-sm-2" />
+	</div>
+</div><script>
+jQuery(function($){
+		$('#date-timepicker1').datetimepicker({
+			//format: 'YYYY/MM/DD h:mm:ss',//use this option to display seconds
+			icons: {
+			time: 'fa fa-clock-o',
+			date: 'fa fa-calendar',
+			up: 'fa fa-chevron-up',
+			down: 'fa fa-chevron-down',
+			previous: 'fa fa-chevron-left',
+			next: 'fa fa-chevron-right',
+			today: 'fa fa-arrows ',
+			clear: 'fa fa-trash',
+			close: 'fa fa-times'
+			}
+	   });
+});
+</script>`
 	beego.Critical("Col", data["Col"])
 	for _, info := range strings.Split(strings.TrimSpace(data["Col"]), " ") {
-		beego.Critical(info)
+		// beego.Critical(info)
 		tmp := strings.Split(info, ":")
 		switch tmp[1] {
 		case "string":
@@ -131,6 +156,52 @@ jQuery(function($){
 			result += strings.Replace(strings.Replace(strings.Replace(strings.Replace(multiselect, "$CONTENT", tmp_multiselect, -1), "$LABELS", tmp[0], -1), "$NAME", tmp[2], -1), "duallist", fmt.Sprintf("%d", time.Now().Nanosecond()), -1)
 		case "file":
 			result += strings.Replace(strings.Replace(strings.Replace(text, "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1), "$TYPE", "file", -1)
+		case "time", "time.Time":
+			result += strings.Replace(strings.Replace(strings.Replace(timed, "-timepicker1", fmt.Sprintf("%d", time.Now().Nanosecond()), -1), "$LABELS", tmp[0], -1), "$NAME", tmp[2], -1)
+		case "o2o":
+			tmp_o2o_string := ""
+			tmp_o2o := strings.Split(tmp[3], "|")
+			// beego.Critical("tmp_o2o", tmp[3])
+			sql := fmt.Sprintf("select * from %s%s", beego.AppConfig.String("snakeMapper"), tmp_o2o[0])
+			// beego.Critical(sql)
+			resultSql, err := Engine.Query(sql)
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			showCol := strings.Split(tmp_o2o[1], ",")
+			for _, x := range resultSql {
+				t_s := "<option value=\"%id\">%value</option>"
+				t_v := ""
+				for _, value := range showCol {
+					t_v += fmt.Sprintf("%s ", string(x[value]))
+					// beego.Critical(value, t_v, string(x[value]), x)
+				}
+				tmp_o2o_string += strings.Replace(strings.Replace(t_s, "%id", string(x[showCol[0]]), -1), "%value", t_v, -1)
+				// beego.Critical(tmp_o2o_string)
+			}
+			result += strings.Replace(strings.Replace(strings.Replace(selected, "$CONTENT", tmp_o2o_string, -1), "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1)
+		case "o2m":
+			tmp_o2o_string := ""
+			tmp_o2o := strings.Split(tmp[3], "|")
+			// beego.Critical("tmp_o2o", tmp[3])
+			sql := fmt.Sprintf("select * from %s%s", beego.AppConfig.String("snakeMapper"), tmp_o2o[0])
+			// beego.Critical(sql)
+			resultSql, err := Engine.Query(sql)
+			if err != nil {
+				beego.Critical(err.Error())
+			}
+			showCol := strings.Split(tmp_o2o[1], ",")
+			for _, x := range resultSql {
+				t_s := "<option value=\"%id\">%value</option>"
+				t_v := ""
+				for _, value := range showCol {
+					t_v += fmt.Sprintf("%s ", string(x[value]))
+					// beego.Critical(value, t_v, string(x[value]), x)
+				}
+				tmp_o2o_string += strings.Replace(strings.Replace(t_s, "%id", string(x[showCol[0]]), -1), "%value", t_v, -1)
+				// beego.Critical(tmp_o2o_string)
+			}
+			result += strings.Replace(strings.Replace(strings.Replace(strings.Replace(multiselect, "$CONTENT", tmp_o2o_string, -1), "$LABELS", tmp[0], -1), "$NAME", tmp[2], -1), "duallist", fmt.Sprintf("%d", time.Now().Nanosecond()), -1)
 		}
 	}
 
