@@ -45,57 +45,56 @@
     </nav> 
 
     <ol class="breadcrumb">
-        <li><a href="#">Home</a></li>
-        <li><a href="#">Library</a></li>
-        <li class="active">Data</li>
+        <li><a href="/admin/test1">Home</a></li>
+        <li><a href="/admin/test">Library</a></li>
+        <li class="active">{{.Name}}</li>
     </ol>
 
-    <div class="row">
-        <div class="col-md-12">  
-            <div class="row">
-                <div class="col-xs-12 col-sm-10 col-md-offset-1">
-                    <h3>Select User to Change</h3>
-                    <!-- <ul class="pager">
-                        <li class="previous disabled">Site Administrator</li>
-                        <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
-                    </ul> -->
-                    <br/>
-                    <div id="toolbar">
-                        <button id="remove" class="btn btn-danger" disabled>
-                            <i class="glyphicon glyphicon-remove"></i> Delete
-                        </button>
-                        <button id="add" class="btn btn-success" disabled>
-                            <i class="glyphicon glyphicon-plus"></i> ADD 
-                        </button>
-                    </div>
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <table id="table"
-                                data-toolbar="#toolbar"
-                                data-search="true"
-                                data-show-refresh="true"
-                                data-show-toggle="true"
-                                data-show-columns="true"
-                                data-show-export="true"
-                                data-detail-view="true"
-                                data-detail-formatter="detailFormatter"
-                                data-minimum-count-columns="2"
-                                data-show-pagination-switch="true"
-                                data-pagination="true"
-                                data-id-field="id"
-                                data-page-list="[10, 25, 50, 100, ALL]"
-                                data-show-footer="false"
-                                data-side-pagination="client"
-                                data-response-handler="responseHandler">
-                                <!-- <thead>
-                                    <tr>
-                                        <th data-field="id">ID</th>
-                                        <th data-field="name">Item Name</th>
-                                        <th data-field="price">Item Price</th>
-                                    </tr>
-                                </thead> -->
-                            </table>
-                        </div>
+    <div class="col-md-12">  
+        <div class="row">
+            <div class="col-xs-12 col-sm-10 col-md-offset-1">
+                <h3>Select {{.Name}} to Change</h3>
+                <!-- <ul class="pager">
+                    <li class="previous disabled">Site Administrator</li>
+                    <li class="next"><a href="#">Newer <span aria-hidden="true">&rarr;</span></a></li>
+                </ul> -->
+                <br/>
+                <div id="toolbar">
+                    <button id="remove" class="btn btn-danger" disabled>
+                        <i class="glyphicon glyphicon-remove"></i> Delete
+                    </button>
+                    <button id="add" class="btn btn-success">
+                        <i class="glyphicon glyphicon-plus"></i> ADD 
+                    </button>
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <table id="table"
+                            data-toolbar="#toolbar"
+                            data-search="true"
+                            data-show-refresh="true"
+                            data-show-toggle="true"
+                            data-show-columns="true"
+                            data-show-export="true"
+                            data-detail-view="true"
+                            data-detail-formatter="detailFormatter"
+                            data-minimum-count-columns="2"
+                            data-show-pagination-switch="true"
+                            data-pagination="true"
+                            data-id-field="id"
+                            data-page-list="[10, 25, 50, 100, ALL]"
+                            data-show-footer="false"
+                            data-side-pagination="server"
+                            data-url="/admin/data?name={{.Name}}"
+                            data-response-handler="responseHandler">
+                            <!-- <thead>
+                                <tr>
+                                    <th data-field="id">ID</th>
+                                    <th data-field="name">Item Name</th>
+                                    <th data-field="price">Item Price</th>
+                                </tr>
+                            </thead> -->
+                        </table>
                     </div>
                 </div>
             </div>
@@ -107,16 +106,22 @@
             selections = [];
             
         $table.bootstrapTable({
-            height:getHeight(),
-            columns:eval({{.Col}})
+            // height:getHeight(),
+            height:400,
+            columns:eval({{.Col | admincolumns}})
         });
 
-        function initTable() {
-            $table.bootstrapTable({
-                height:getHeight(),
-                columns:eval({{.Col}})
-            });
-        };
+        // function initTable() {
+        //     $table.bootstrapTable({
+        //         height:getHeight(),
+        //         columns:eval({{.Col}})
+        //     });
+        // };
+
+        // function initTable() {
+        //     console.log('ok');
+        // }
+
         setTimeout(function () {
             $table.bootstrapTable('resetView');
         }, 200);
@@ -139,12 +144,22 @@
             console.log(name, args);
         });
         $remove.click(function () {
-            var ids = getIdSelections();
-            $table.bootstrapTable('remove', {
-                field: 'id',
-                values: ids
-            });
-            $remove.prop('disabled', true);
+            var r = confirm("确定删除吗？");
+            if (r==true){
+                var ids = getIdSelections();
+                $.ajax({
+                    url:'/admin/delete?name={{.Name}}&ids='+ids.join(),
+                    type:'Post',
+                    success:function (data) {
+                        alert(data);
+                        $table.bootstrapTable('remove', {
+                            field: 'id',
+                            values: ids
+                        });
+                    }
+                })
+                $remove.prop('disabled', true);
+            }
         });
         $(window).resize(function () {
             $table.bootstrapTable('resetView', {
@@ -205,7 +220,8 @@
             return '$' + total;
         }
         function getHeight() {
-            return $(window).height() - $('h1').outerHeight(true);
+            // return $(window).height() - $('h1').outerHeight(true);
+            return $(window).height();
         }
         $(function () {
             var scripts = [

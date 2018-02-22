@@ -1,2 +1,4 @@
 beegoadmin
 sqlite.db
+db.sqlite3
+.idea

@@ -28,7 +28,7 @@ func NewColumns(filed string, checkbox bool) *Columns {
 }
 
 func MutilColumms(data ...string) []Columns {
-	tmp := []Columns{}
+	tmp := []Columns{Columns{Checkbox: true}}
 	for _, x := range data {
 		tmp = append(tmp, *NewColumns(x, false))
 	}
