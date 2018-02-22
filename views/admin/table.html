@@ -63,7 +63,7 @@
                     <button id="remove" class="btn btn-danger" disabled>
                         <i class="glyphicon glyphicon-remove"></i> Delete
                     </button>
-                    <button id="add" class="btn btn-success">
+                    <button id="add" class="btn btn-success" onclick="Add({{.Name}})">
                         <i class="glyphicon glyphicon-plus"></i> ADD 
                     </button>
                 </div>
@@ -103,8 +103,13 @@
     <script>
         var $table = $('#table'),
             $remove = $('#remove'),
+            $add= $('#add'),
             selections = [];
-            
+        
+        function Add(name) {
+            window.open("http://"+window.location.host+"/admin/add?name="+name,"new open monitor","height=600,width=1000,top=0,left=200,fullscreen=no,scrollbars=0");
+        }
+
         $table.bootstrapTable({
             // height:getHeight(),
             height:400,
@@ -118,9 +123,9 @@
         //     });
         // };
 
-        // function initTable() {
-        //     console.log('ok');
-        // }
+        function initTable() {
+            console.log('ok');
+        }
 
         setTimeout(function () {
             $table.bootstrapTable('resetView');
