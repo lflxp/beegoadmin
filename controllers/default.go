@@ -14,10 +14,11 @@ type MainController struct {
 	beego.Controller
 }
 
-func (c *MainController) Get() {
-	c.Data["Website"] = "beego.me"
-	c.Data["Email"] = "astaxie@gmail.com"
-	c.TplName = "index.tpl"
+func (this *MainController) Get() {
+	fmt.Println(models.Registered)
+	this.Data["Data"] = models.Registered
+	this.Data["User"] = "Boss"
+	this.TplName = "admin/test.1.html"
 }
 
 func (this *MainController) Admin() {
@@ -31,10 +32,10 @@ func (this *MainController) Admin() {
 			this.TplName = "admin/test.html"
 		} else if types == "add" {
 			name := this.GetString("name", "None")
-			this.Data["Data"] = models.Registered
-			// if name != "None" {
-			// 	this.Data["Col"] = models.GetRegisterByName(name)
-			// }
+			// this.Data["Data"] = models.Registered
+			if name != "None" {
+				this.Data["Col"] = models.GetRegisterByName(name)
+			}
 			this.Data["Name"] = name
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/add.html"
@@ -59,8 +60,13 @@ func (this *MainController) Admin() {
 			}
 
 			tt1 := models.Vpn{}
+			tt1.Id = 9
 			tt1.Name = "ok"
 			utils.Engine.Insert(&tt1)
+
+			m1 := models.More{}
+			m1.Vpn = tt1
+			utils.Engine.Insert(&m1)
 			beego.Critical(num)
 			Name := this.GetString("name", "None")
 			if Name != "None" {

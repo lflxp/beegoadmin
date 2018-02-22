@@ -17,6 +17,7 @@ func init() {
 */
 
 import (
+	"github.com/astaxie/beego"
 	"github.com/go-xorm/core"
 	"github.com/go-xorm/xorm"
 	"github.com/lflxp/beegoadmin/models"
@@ -38,11 +39,11 @@ func init() {
 	Engine.SetMaxIdleConns(300)
 	Engine.SetMaxOpenConns(300)
 	Engine.SetMapper(core.SnakeMapper{})
-	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, "admin_")
+	tbMapper := core.NewPrefixMapper(core.SnakeMapper{}, beego.AppConfig.String("snakeMapper"))
 	Engine.SetTableMapper(tbMapper)
 	Engine.SetColumnMapper(core.SameMapper{})
 
-	err = Engine.Sync2(new(models.Machine), new(models.Vpn), new(models.Cdn))
+	err = Engine.Sync2(new(models.Machine), new(models.Vpn), new(models.Cdn), new(models.More))
 	if err != nil {
 		panic(err)
 	}
