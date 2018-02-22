@@ -1,3 +1,5 @@
 beegoadmin
 sqlite.db
 .vscode
+db.sqlite3
+.idea
