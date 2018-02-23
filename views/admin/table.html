@@ -46,7 +46,6 @@
 
     <ol class="breadcrumb">
         <li><a href="/admin/test1">Home</a></li>
-        <li><a href="/admin/test">Library</a></li>
         <li class="active">{{.Name}}</li>
     </ol>
 
@@ -110,9 +109,13 @@
             window.open("http://"+window.location.host+"/admin/add?name="+name,"new open monitor","height=600,width=1000,top=0,left=200,fullscreen=no,scrollbars=0");
         }
 
+        function Edit(name,id) {
+            window.open("http://"+window.location.host+"/admin/edit?name="+name+"&id="+id,"new open monitor","height=600,width=1000,top=0,left=200,fullscreen=no,scrollbars=0");
+        }
+
         $table.bootstrapTable({
-            // height:getHeight(),
-            height:400,
+            height:getHeight(),
+            // height:400,
             columns:eval({{.Col | admincolumns}})
         });
 

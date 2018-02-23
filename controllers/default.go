@@ -3,7 +3,6 @@ package controllers
 import (
 	"fmt"
 	"strings"
-	"time"
 
 	"github.com/astaxie/beego"
 	"github.com/lflxp/beegoadmin/models"
@@ -50,29 +49,6 @@ func (this *MainController) Admin() {
 			// 	this.Data["Col"] = data
 			// }
 
-			tt := models.Machine{}
-			tt.Mac = "DDD"
-			tt.Ip = "1.2.3.4"
-			tt.Name = time.Now().Format("2006-01-02 15:03:05")
-			num, err := utils.Engine.Insert(&tt)
-			if err != nil {
-				beego.Critical(err.Error())
-			}
-			beego.Critical(num)
-
-			tt1 := models.Vpn{}
-			tt1.Ip = "9.9.9.9"
-			tt1.Vpn = "bj-001"
-			tt1.Name = "ok"
-			utils.Engine.Insert(&tt1)
-
-			m1 := models.More{}
-			// m1.Vpn = tt1
-			n, e := utils.Engine.Insert(&m1)
-			if e != nil {
-				beego.Critical(e.Error())
-			}
-			beego.Critical(n)
 			Name := this.GetString("name", "None")
 			if Name != "None" {
 				this.Data["Col"] = models.GetRegisterByName(Name)
@@ -80,9 +56,32 @@ func (this *MainController) Admin() {
 			this.Data["Name"] = Name
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/table.html"
+		} else if types == "edit" {
+			name := this.GetString("name", "None")
+			id := this.GetString("id", "None")
+			if name != "None" && id != "None" {
+				//查询sql
+				check_sql := fmt.Sprintf("select * from %s%s where id=%s", beego.AppConfig.String("snakeMapper"), name, id)
+				result, err := utils.Engine.Query(check_sql)
+				if err != nil {
+					this.Ctx.WriteString(err.Error())
+					return
+				}
+				if len(result) == 1 {
+					this.Data["Col"] = utils.EditFormColumns(models.GetRegisterByName(name), result[0])
+				} else {
+					this.Ctx.WriteString(fmt.Sprintf("Id %s 返回数据超过1条 实际为 %d", id, len(result)))
+					return
+				}
+				this.Data["Name"] = name
+			}
+			this.Data["User"] = "Boss"
+			this.TplName = "admin/edit.html"
 		} else if types == "data" {
+			var sql string
 			name := this.GetString("name", "None")
 			order := this.GetString("order", "None")
+			search := this.GetString("search", "None")
 			offset, err := this.GetInt("offset")
 			if err != nil {
 				beego.Critical(err.Error())
@@ -91,7 +90,7 @@ func (this *MainController) Admin() {
 			if err != nil {
 				beego.Critical(err.Error())
 			}
-			beego.Critical(name, order, offset, limit)
+			beego.Critical(name, order, offset, limit, search)
 			// ttt := map[string]interface{}{}
 			// tmp := []map[string]string{}
 			// for i := 0; i < 1000; i++ {
@@ -102,12 +101,24 @@ func (this *MainController) Admin() {
 			// }
 			// ttt["total"] = 1000
 			// ttt["rows"] = tmp
-			sql := fmt.Sprintf("select * from admin_%s  order by id %s limit %d offset %d", strings.ToLower(name), order, limit, offset)
+			if search == "None" {
+				sql = fmt.Sprintf("select * from %s%s order by id %s limit %d offset %d", beego.AppConfig.String("snakeMapper"), strings.ToLower(name), order, limit, offset)
+			} else {
+				searchs := models.GetRegisterByName(name)
+				if searchs != nil {
+					if strings.Contains(searchs["Search"], ",") {
+						sql = fmt.Sprintf("select * from %s%s where %s order by id %s limit %d offset %d", beego.AppConfig.String("snakeMapper"), strings.ToLower(name), strings.Replace(searchs["Search"], ",", fmt.Sprintf("='%s' and ", search), -1), order, limit, offset)
+					} else {
+						sql = fmt.Sprintf("select * from %s%s where %s order by id %s limit %d offset %d", beego.AppConfig.String("snakeMapper"), strings.ToLower(name), fmt.Sprintf("%s='%s'", searchs["Search"], search), order, limit, offset)
+					}
+				}
+			}
+			beego.Critical(sql)
 			result, err := utils.Engine.Query(sql)
 			if err != nil {
 				beego.Critical(err.Error())
 			}
-			total, err := utils.Engine.Table("admin_" + strings.ToLower(name)).Count()
+			total, err := utils.Engine.Table(beego.AppConfig.String("snakeMapper") + strings.ToLower(name)).Count()
 			if err != nil {
 				beego.Critical(err.Error())
 			}
@@ -120,6 +131,11 @@ func (this *MainController) Admin() {
 					// result[n][key] = string(value)
 					tmp[strings.ToLower(key)] = string(value)
 				}
+				op := `<button type="button" class="btn btn-warning" aria-label="Left Align" onclick="Edit('$NAME','$ID')">
+				<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+			  </button>`
+				tmp["操作"] = strings.Replace(strings.Replace(op, "$NAME", name, -1), "$ID", string(x["id"]), -1)
+
 				t2 = append(t2, tmp)
 			}
 			ttt["rows"] = t2
@@ -166,6 +182,37 @@ func (this *MainController) Admin() {
 			beego.Critical(sql)
 			_, err := utils.Engine.Query(sql)
 			if err != nil {
+				this.Ctx.WriteString(err.Error())
+				return
+			}
+			// this.Ctx.WriteString("insert ok")
+			this.Ctx.Redirect(301, fmt.Sprintf("/admin/add?name=%s", name))
+		} else if types == "edit" {
+			result := map[string]string{}
+
+			name := this.GetString("table", "None")
+			beego.Critical(string(this.Ctx.Input.RequestBody))
+			//获取字段和所有值
+			body := strings.Replace(string(this.Ctx.Input.RequestBody), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
+			for _, x := range strings.Split(body, "&") {
+				tmp := strings.Split(x, "=")
+				if tmp[1] != "" {
+					result[tmp[0]] += fmt.Sprintf("%s ", tmp[1])
+				}
+				// col = append(col, tmp[0])
+				// value = append(value, fmt.Sprintf("'%s'", tmp[1]))
+			}
+			set_string := []string{}
+			for keyed, valueed := range result {
+				if keyed != "id" {
+					set_string = append(set_string, strings.Replace(fmt.Sprintf("%s='%s'", keyed, strings.TrimSpace(valueed)), " ", ",", -1))
+				}
+			}
+			sql := fmt.Sprintf("update %s%s set %s where id=%s", beego.AppConfig.String("snakeMapper"), name, strings.Join(set_string, ","), result["id"])
+			beego.Critical(sql)
+			_, err := utils.Engine.Query(sql)
+			if err != nil {
+				beego.Critical("sql eeeeeeee", err.Error())
 				this.Ctx.WriteString(err.Error())
 				return
 			}

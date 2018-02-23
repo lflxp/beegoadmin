@@ -53,13 +53,13 @@
     <ol class="breadcrumb">
         <li><a href="/admin/test1">Home</a></li>
         <li><a href="/admin/table?name={{.Name}}">{{.Name}}</a></li>
-        <li class="active">ADD</li>
+        <li class="active">Change</li>
     </ol>
 
     <div class="col-md-11">  
         <div class="row">
             <div class="col-xs-12 col-sm-10 col-md-offset-2">
-                <h3>Add {{.Name}} </h3>
+                <h3>Change {{.Name}} </h3>
                 <!-- <ul class="pager">
                     <li class="previous disabled">site administrator</li>
                     <li class="next"><a href="#">newer <span aria-hidden="true">&rarr;</span></a></li>
@@ -70,10 +70,10 @@
         <div class="row">
             <div class="col-sm-12">
                 <!-- <iframe name="targetIfr" style="display:none"></iframe>  -->
-                <form id="myform" class="form-horizontal" role="form" method="POST" action="/admin/add?table={{.Name}}">  
+                <form id="myform" class="form-horizontal" role="form" method="POST" action="/admin/edit?table={{.Name}}">  
                 <!-- <form id="myform" class="form-horizontal" role="form" method="POST" action="/admin/add?table={{.Name}}" target="targetIfr">   -->
                 <!-- <form class="form-horizontal" role="form" id="myform">   -->
-                    {{.Col| formcolumns | str2html}}
+                    {{.Col| str2html}}
                     <!-- <div class="form-group">
                         <label class="col-sm-2 control-label no-padding-right" for="form-field-1"> text field </label>
                         <div class="col-sm-10">

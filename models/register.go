@@ -43,7 +43,7 @@ func RigsterStruct(data interface{}) map[string]string {
 
 	tmp["Struct"] = v.Type().Name()
 	for i := 0; i < v.NumField(); i++ {
-		if strings.ToLower(v.Type().Field(i).Name) != "id" && strings.ToLower(v.Type().Field(i).Name) != "create" && strings.ToLower(v.Type().Field(i).Name) != "update" {
+		if strings.ToLower(v.Type().Field(i).Name) != "id" && v.Type().Field(i).Tag.Get("name") != "id" && v.Type().Field(i).Tag.Get("xorm") != "-" && strings.ToLower(v.Type().Field(i).Name) != "create" && strings.ToLower(v.Type().Field(i).Name) != "update" {
 			//利用反射获取structTag
 			tmp["Tag"] = fmt.Sprintf("%s", v.Type().Field(i).Tag)
 			// html 字段类型
@@ -80,6 +80,20 @@ func RigsterStruct(data interface{}) map[string]string {
 				tmp["Col"] = fmt.Sprintf("%s %s:%s:%s:%s", tmp["Col"], v.Type().Field(i).Tag.Get("verbose_name"), tmp["ColType"], tmp["Name"], tmp["detail"])
 			} else {
 				tmp["Col"] = fmt.Sprintf("%s %s:%s:%s:%s", tmp["Col"], v.Type().Field(i).Name, tmp["ColType"], tmp["Name"], tmp["detail"])
+			}
+			//collect show list on table columns
+			if v.Type().Field(i).Tag.Get("list") == "true" || v.Type().Field(i).Tag.Get("list") == "" {
+				//name
+				tmp["List"] += fmt.Sprintf("%s ", tmp["Name"])
+			}
+			//collect show search on table columns
+			if v.Type().Field(i).Tag.Get("search") == "true" {
+				//name
+				if tmp["Search"] == "" {
+					tmp["Search"] = tmp["Name"]
+				} else {
+					tmp["Search"] = fmt.Sprintf("%s,%s", tmp["Search"], tmp["Name"])
+				}
 			}
 		}
 	}
