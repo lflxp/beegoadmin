@@ -27,11 +27,11 @@ type Vpn struct {
 }
 
 type Cdn struct {
-	Id           int64     `xorm:"id" name:"id" search:"true"`
+	Id           int64     `xorm:"id pk not null autoincr" name:"id" search:"true"`
 	Num          int64     `xorm:"num" verbose_name:"数字" name:"num" colType:"int" list:"true" search:"true"`
 	Cdn_name     string    `xorm:"cdn_name" name:"cdn_name" verbose_name:"cdn的名称" search:"true"`
 	Type         string    `xorm:"type" name:"type" verbose_name:"类型" search:"false" colType:"textarea"`
-	Detail       string    `xorm:"detail" name:"detail" verbose_name:"VPN信息" list:"true" search:"false" o2m:"vpn|id,vpn" colType:"o2m"`
+	Detail       string    `xorm:"detail" name:"detail" verbose_name:"VPN信息" list:"false" search:"false" o2m:"vpn|id,vpn" colType:"o2m"`
 	Radio        string    `xorm:"raidodas" name:"raidodas" verbose_name:"Radio单选" list:"true" search:"false" colType:"radio" radio:"男|man,女|girl,人妖|none"`
 	Select       string    `xorm:"ss" name:"ss" verbose_name:"Select单选固定" list:"true" search:"false" colType:"select" select:"男11111111111111111111111111|man,女|girl,人妖|none"`
 	MultiSelect  string    `xorm:"ss1" name:"ss1" verbose_name:"Multiselect多选" list:"true" search:"false" colType:"multiselect" multiselect:"男|man,女|girl,人妖|none,中|zhong,国|guo,人|ren,重|chong,Qing|qing"`
@@ -43,7 +43,7 @@ type Cdn struct {
 }
 
 type Machine struct {
-	Id     int64     `xorm:"id" name:"id" search:"true"`
+	Id     int64     `xorm:"id pk not null autoincr" name:"id" search:"true"`
 	Sn     string    `xorm:"sn" name:"sn" search:"true"`
 	Mac    string    `xorm:"mac" name:"mac" search:"true"`
 	Ip     string    `xorm:"ip" name:"ip" search:"true"`
@@ -53,9 +53,9 @@ type Machine struct {
 }
 
 type More struct {
-	Uid      int64  `xorm:"id pk not null autoincr"`
-	Username string `xorm:"unique"`
+	Uid      int64  `xorm:"id pk not null autoincr" name:"id"`
+	Username string `xorm:"username unique" name:"username" search:"true"`
 	Alias    string `xorm:"-"`
-	Vpn      `xorm:"vpn_id int(11)" colType:"o2o" o2o:"vpn|id,name,ip,vpn" verbose_name:"vpn外键" name:"vpn"`
+	Vpn      `xorm:"vpn_id int(11)" colType:"o2o" o2o:"vpn|id,name,ip,vpn" verbose_name:"vpn外键" name:"vpn_id"`
 	MoreVpn  string `xorm:"more" colType:"o2m" o2m:"vpn|id,name,ip,vpn" verbose_name:"vpn一对多" name:"more"` //id1,id2,id3,id4
 }
