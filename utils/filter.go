@@ -296,6 +296,8 @@ jQuery(function($){
 		// beego.Critical(info)
 		tmp := strings.Split(info, ":")
 		switch tmp[1] {
+		case "password":
+			result += strings.Replace(strings.Replace(strings.Replace(strings.Replace(text, "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1), "$TYPE", "password", -1), "$VALUE", string(dbinfo[tmp[2]]), -1)
 		case "string":
 			result += strings.Replace(strings.Replace(strings.Replace(strings.Replace(text, "$NAME", tmp[2], -1), "$LABELS", tmp[0], -1), "$TYPE", "text", -1), "$VALUE", string(dbinfo[tmp[2]]), -1)
 		case "int", "int16", "int64":

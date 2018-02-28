@@ -4,8 +4,6 @@ import (
 	"fmt"
 	"reflect"
 	"strings"
-
-	"github.com/astaxie/beego"
 )
 
 var Registered []map[string]string
@@ -35,7 +33,7 @@ func RigsterStruct(data interface{}) map[string]string {
 	vv := reflect.ValueOf(data)
 	v := reflect.Indirect(vv)
 
-	beego.Critical("API", v.Type().Name(), v.Type().PkgPath())
+	// beego.Critical("API", v.Type().Name(), v.Type().PkgPath())
 	services := strings.Split(v.Type().PkgPath(), "/")
 	tmp["Services"] = services[len(services)-2]
 	// vv.MethodByName().FieldByName()
@@ -52,7 +50,7 @@ func RigsterStruct(data interface{}) map[string]string {
 			} else {
 				tmp["ColType"] = v.Type().Field(i).Type.String()
 			}
-			beego.Critical("ColType", tmp["ColType"])
+			// beego.Critical("ColType", tmp["ColType"])
 			switch tmp["ColType"] {
 			case "radio":
 				tmp["detail"] = v.Type().Field(i).Tag.Get("radio")
