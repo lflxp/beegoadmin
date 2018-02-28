@@ -38,9 +38,7 @@ beegoadmin 使用bootstrap3作为前端页面框架 模仿django admin界面进�
 
 - 自动注册model进行数据解析和界面动态生成
 
-注册model代码::
-
-``
+```
 package models
 
 import (
@@ -74,7 +72,7 @@ type Cdn struct {
 	Create       time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
 	Update       time.Time `xorm:"updated"` //这个Field将在Insert或Update时自动赋值为当前时间
 }
-``
+```
 
 - 标记注释字段类型
 
