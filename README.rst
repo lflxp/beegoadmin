@@ -12,28 +12,26 @@ beegoadmin 使用bootstrap3作为前端页面框架 模仿django admin界面进�
 功能模块
 =======
 
-.. |logo| image:: https://help.github.com/assets/images/site/favicon.ico
-
 - 主页面表展示
 
 界面展示
 -------
 
-.. |logo| image:: https://help.github.com/assets/images/site/favicon.ico
+.. image:: img/1.png
 
 - 表数据查询
 
 表数据查询
 ---------
 
-.. |logo| image:: https://help.github.com/assets/images/site/favicon.ico
+.. image:: img/2.png
 
 - 表数据删除、添加、修改
 
 数据增删改
 ---------
 
-.. |logo| image:: https://help.github.com/assets/images/site/favicon.ico
+.. image:: img/3.png
 
 特点
 ====
