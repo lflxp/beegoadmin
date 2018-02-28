@@ -43,7 +43,7 @@ func init() {
 	Engine.SetTableMapper(tbMapper)
 	Engine.SetColumnMapper(core.SameMapper{})
 
-	err = Engine.Sync2(new(models.Machine), new(models.Vpn), new(models.Cdn), new(models.More))
+	err = Engine.Sync2(new(models.Machine), new(models.Vpn), new(models.Cdn), new(models.More), new(models.User), new(models.Userauth), new(models.Group))
 	if err != nil {
 		panic(err)
 	}

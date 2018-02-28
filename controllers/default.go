@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"fmt"
+	"net/url"
 	"strings"
 
 	"github.com/astaxie/beego"
@@ -14,7 +15,7 @@ type MainController struct {
 }
 
 func (this *MainController) Get() {
-	fmt.Println(models.Registered)
+	// fmt.Println(models.Registered)
 	this.Data["Data"] = models.Registered
 	this.Data["User"] = "Boss"
 	this.TplName = "admin/test.1.html"
@@ -39,7 +40,7 @@ func (this *MainController) Admin() {
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/add.html"
 		} else if types == "test1" {
-			fmt.Println(models.Registered)
+			// fmt.Println(models.Registered)
 			this.Data["Data"] = models.Registered
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.1.html"
@@ -161,26 +162,31 @@ func (this *MainController) Admin() {
 		} else if types == "add" {
 			col := []string{}
 			value := []string{}
-			result := map[string]string{}
 
 			name := this.GetString("table", "None")
-			beego.Critical(string(this.Ctx.Input.RequestBody))
+			// beego.Critical(string(this.Ctx.Input.RequestBody))
 			//获取字段和所有值
 			body := strings.Replace(string(this.Ctx.Input.RequestBody), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
-			for _, x := range strings.Split(body, "&") {
-				tmp := strings.Split(x, "=")
-				result[tmp[0]] += fmt.Sprintf("%s ", tmp[1])
-				// col = append(col, tmp[0])
-				// value = append(value, fmt.Sprintf("'%s'", tmp[1]))
+			parseBody, err := url.Parse(body)
+			if err != nil {
+				this.Ctx.WriteString(err.Error())
+				return
+			}
+			// beego.Critical(parseBody.Path)
+			l, err := url.ParseQuery(parseBody.Path)
+			if err != nil {
+				beego.Critical(err.Error())
+				this.Ctx.WriteString(err.Error())
+				return
 			}
 
-			for keyed, valueed := range result {
-				col = append(col, keyed)
-				value = append(value, fmt.Sprintf("'%s'", strings.Replace(strings.TrimSpace(valueed), " ", ",", -1)))
+			for keyed, valueed := range l {
+				col = append(col, fmt.Sprintf("'%s'", keyed))
+				value = append(value, fmt.Sprintf("'%s'", strings.Join(valueed, ",")))
 			}
 			sql := fmt.Sprintf("insert into %s%s(%s) values (%s)", beego.AppConfig.String("snakeMapper"), name, strings.Join(col, ","), strings.Join(value, ","))
 			beego.Critical(sql)
-			_, err := utils.Engine.Query(sql)
+			_, err = utils.Engine.Query(sql)
 			if err != nil {
 				this.Ctx.WriteString(err.Error())
 				return
@@ -188,33 +194,39 @@ func (this *MainController) Admin() {
 			// this.Ctx.WriteString("insert ok")
 			this.Ctx.Redirect(301, fmt.Sprintf("/admin/add?name=%s", name))
 		} else if types == "edit" {
-			result := map[string]string{}
-
 			name := this.GetString("table", "None")
-			beego.Critical(string(this.Ctx.Input.RequestBody))
-			//获取字段和所有值
-			body := strings.Replace(string(this.Ctx.Input.RequestBody), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
-			for _, x := range strings.Split(body, "&") {
-				tmp := strings.Split(x, "=")
-				if tmp[1] != "" {
-					result[tmp[0]] += fmt.Sprintf("%s ", tmp[1])
+			id := this.GetString("id", "None")
+			if name != "None" && id != "None" {
+				beego.Critical(string(this.Ctx.Input.RequestBody))
+				//获取字段和所有值
+				body := strings.Replace(string(this.Ctx.Input.RequestBody), "&_save=%E4%BF%9D%E5%AD%98", "", -1)
+				parseBody, err := url.Parse(body)
+				if err != nil {
+					this.Ctx.WriteString(err.Error())
+					return
 				}
-				// col = append(col, tmp[0])
-				// value = append(value, fmt.Sprintf("'%s'", tmp[1]))
-			}
-			set_string := []string{}
-			for keyed, valueed := range result {
-				if keyed != "id" {
-					set_string = append(set_string, strings.Replace(fmt.Sprintf("%s='%s'", keyed, strings.TrimSpace(valueed)), " ", ",", -1))
+				// beego.Critical(parseBody.Path)
+				l, err := url.ParseQuery(parseBody.Path)
+				if err != nil {
+					beego.Critical(err.Error())
+					this.Ctx.WriteString(err.Error())
+					return
 				}
-			}
-			sql := fmt.Sprintf("update %s%s set %s where id=%s", beego.AppConfig.String("snakeMapper"), name, strings.Join(set_string, ","), result["id"])
-			beego.Critical(sql)
-			_, err := utils.Engine.Query(sql)
-			if err != nil {
-				beego.Critical("sql eeeeeeee", err.Error())
-				this.Ctx.WriteString(err.Error())
-				return
+
+				set_string := []string{}
+				for keyed, valueed := range l {
+					if keyed != "id" {
+						set_string = append(set_string, fmt.Sprintf("'%s'='%s'", keyed, strings.Join(valueed, ",")))
+					}
+				}
+				sql := fmt.Sprintf("update %s%s set %s where id=%s", beego.AppConfig.String("snakeMapper"), name, strings.Join(set_string, ","), id)
+				beego.Critical(sql)
+				_, err = utils.Engine.Query(sql)
+				if err != nil {
+					beego.Critical("sql eeeeeeee", err.Error())
+					this.Ctx.WriteString(err.Error())
+					return
+				}
 			}
 			// this.Ctx.WriteString("insert ok")
 			this.Ctx.Redirect(301, fmt.Sprintf("/admin/add?name=%s", name))

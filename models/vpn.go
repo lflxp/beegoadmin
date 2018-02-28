@@ -6,7 +6,7 @@ import (
 
 func init() {
 	// vpn := Vpn{}s
-	Register(new(Vpn), new(Machine), new(Cdn), new(More))
+	Register(new(Vpn), new(Machine), new(Cdn), new(More), new(User), new(Group), new(Userauth))
 }
 
 /*
@@ -15,7 +15,7 @@ verbose_name 标识
 list_display 显示字段
 search_fields 查询字段
 manytomany 一对多字段 指定表明
-colType 字段类型 -> string|int|file|textarea|radio|m2m|otm|o2o|time|select|multiselect
+colType 字段类型 -> string|int|file|textarea|radio|m2m|otm|o2o|time|select|multiselect|password
 radio|select -> Name|value,Name|value,...
 o2o -> "tablename|showColumns,showColumns" -> first columns is id
 */
@@ -58,4 +58,29 @@ type More struct {
 	Alias    string `xorm:"-"`
 	Vpn      `xorm:"vpn_id int(11)" colType:"o2o" o2o:"vpn|id,name,ip,vpn" verbose_name:"vpn外键" name:"vpn_id"`
 	MoreVpn  string `xorm:"more" colType:"o2m" o2m:"vpn|id,name,ip,vpn" verbose_name:"vpn一对多" name:"more"` //id1,id2,id3,id4
+}
+
+type User struct {
+	Id        int64  `xorm:"id pk not null autoincr" name:"id"`
+	Username  string `xorm:"username" name:"username" verbose_name:"用户名" list:"true" search:"true"`
+	Password  string `xorm:"password" name:"password" verbose_name:"密码" colType:"password" list:"true" search:"true"`
+	Name      string `xorm:"name" name:"name" verbose_name:"名字" list:"true" search:"true"`
+	FirstName string `xorm:"firstname" name:"firstname" verbose_name:"姓氏" list:"true" search:"true"`
+	email     string `xorm:"email" name:"email" verbose_name:"电子邮件" list:"true" search:"true"`
+	IsVaild   string `xorm:"isvaild" name:"isvaild" verbose_name:"有效" list:"true" search:"false" colType:"radio" radio:"有效|1,无效|0"`
+	Status    string `xorm:"status" name:"isvaild" verbose_name:"状态" list:"true" search:"false" colType:"radio" radio:"有效|1,无效|0"`
+	IsAdmin   string `xorm:"isadmin" name:"isvaild" verbose_name:"超级用户状态" list:"true" search:"false" colType:"radio" radio:"是|1,不是|0"`
+}
+
+type Group struct {
+	Id   int64  `xorm:"id pk not null autoincr" name:"id"`
+	Name string `xorm:"name" name:"name" verbose_name:"名称" list:"true" search:"true"`
+	Auth string `xorm:"auth" name:"auth" verbose_name:"权限" colType:"o2m" o2m:"userauth|name,group,content"`
+}
+
+type Userauth struct {
+	Id      int64  `xorm:"id pk not null autoincr" name:"id"`
+	Name    string `xorm:"name" name:"name" verbose_name:"名称" list:"true" search:"true"`
+	Group   string `xorm:"group" name:"group" verbose_name:"分组" list:"true" search:"true"`
+	Content string `xorm:"content" name:"content" verbose_name:"内容" list:"false" search:"false"`
 }
