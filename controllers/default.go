@@ -11,12 +11,18 @@ import (
 )
 
 type MainController struct {
-	beego.Controller
+	BaseController
 }
 
 func (this *MainController) Get() {
 	// fmt.Println(models.Registered)
+	Hs := make([]models.History, 0)
+	err := utils.Engine.Desc("id").Limit(10, 0).Find(&Hs)
+	if err != nil {
+		panic(err)
+	}
 	this.Data["Data"] = models.Registered
+	this.Data["History"] = Hs
 	this.Data["User"] = "Boss"
 	this.TplName = "admin/test.1.html"
 }
@@ -41,7 +47,13 @@ func (this *MainController) Admin() {
 			this.TplName = "admin/add.html"
 		} else if types == "test1" {
 			// fmt.Println(models.Registered)
+			Hs := make([]models.History, 0)
+			err := utils.Engine.Desc("id").Limit(10, 0).Find(&Hs)
+			if err != nil {
+				panic(err)
+			}
 			this.Data["Data"] = models.Registered
+			this.Data["History"] = Hs
 			this.Data["User"] = "Boss"
 			this.TplName = "admin/test.1.html"
 		} else if types == "table" {

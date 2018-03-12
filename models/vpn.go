@@ -6,7 +6,7 @@ import (
 
 func init() {
 	// vpn := Vpn{}s
-	Register(new(Vpn), new(Machine), new(Cdn), new(More), new(User), new(Group), new(Userauth))
+	Register(new(Vpn), new(Machine), new(Cdn), new(More), new(User), new(Group), new(Userauth), new(History))
 }
 
 /*
@@ -83,4 +83,13 @@ type Userauth struct {
 	Name    string `xorm:"name" name:"name" verbose_name:"名称" list:"true" search:"true"`
 	Group   string `xorm:"group" name:"group" verbose_name:"分组" list:"true" search:"true"`
 	Content string `xorm:"content" name:"content" verbose_name:"内容" list:"false" search:"false"`
+}
+
+type History struct {
+	Id     int64     `xorm:"id pk not null autoincr" name:"id"`
+	Name   string    `xorm:"name" name:"name" verbose_name:"操作历史" list:"true"`
+	Op     string    `xorm:"op" name:"op" verbose_name:"操作"`
+	Common string    `xorm:"common" name:"common" verbose_name:"备注"`
+	Create time.Time `xorm:"created"` //这个Field将在Insert时自动赋值为当前时间
+	Update time.Time `xorm:"updated"` //这个Field将在Insert或Update时自动赋值为当前时间
 }
